@@ -11,9 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "🎉 Triggered by a ${{ github.event_name }} event."
-      - run: echo "📁 Figma file: ${{ github.event.client_payload.filename }}"
-      - run: echo "👤 Figma user: ${{ github.event.client_payload.user }}"
-      - run: echo "🔎 Branch: ${{ github.ref }} | Repo: ${{ github.repository }}"
+      - name: Show Figma File (only on dispatch)
+        if: github.event_name == 'repository_dispatch'
+        run: |
+          echo "📁 Figma file: ${{ github.event.client_payload.filename }}"
+      - name: Show Figma User (only on dispatch)
+        if: github.event_name == 'repository_dispatch'
+        run: |
+          echo "👤 Figma user: ${{ github.event.client_payload.user }}"
       - name: Check out repository code
         uses: actions/checkout@v4
       - run: ls ${{ github.workspace }}
