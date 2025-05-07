@@ -30,10 +30,12 @@ jobs:
 
           echo "new_version=$new_version" >> $GITHUB_OUTPUT
 
-      - name: Create new branch
+      - name: Create new branch and commit version bump
+        env:
+          GIT_AUTH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
 
           git checkout -b version/${{ steps.versioning.outputs.new_version }}
 
@@ -41,4 +43,7 @@ jobs:
           jq --arg v "${{ steps.versioning.outputs.new_version }}" '.version = $v' package.json > tmp.json && mv tmp.json package.json
           git add package.json
           git commit -m "Bump version to ${{ steps.versioning.outputs.new_version }}"
+
+          # Set remote with token and push
+          git remote set-url origin https://x-access-token:${GIT_AUTH_TOKEN}@github.com/${{ github.repository }}.git
           git push origin version/${{ steps.versioning.outputs.new_version }}
