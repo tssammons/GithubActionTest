@@ -1,0 +1,44 @@
+name: Bump Version and Create Branch
+
+on:
+  workflow_dispatch:  # Manual trigger, you can change this to push or PR
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Read and bump version
+        id: versioning
+        run: |
+          version=$(jq -r '.version' package.json)
+          echo "Current version: $version"
+
+          # Split and bump patch version
+          IFS='.' read -r major minor patch <<< "$version"
+          new_patch=$((patch + 1))
+          new_version="$major.$minor.$new_patch"
+          echo "New version: $new_version"
+
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+
+      - name: Create new branch
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git checkout -b version/${{ steps.versioning.outputs.new_version }}
+
+          # Update version in package.json
+          jq --arg v "${{ steps.versioning.outputs.new_version }}" '.version = $v' package.json > tmp.json && mv tmp.json package.json
+          git add package.json
+          git commit -m "Bump version to ${{ steps.versioning.outputs.new_version }}"
+          git push origin version/${{ steps.versioning.outputs.new_version }}
