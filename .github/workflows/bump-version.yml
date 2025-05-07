@@ -1,15 +1,17 @@
 name: Bump Version and Create Branch
 
 on:
-  workflow_dispatch:  # Manual trigger, you can change this to push or PR
+  workflow_dispatch:
 
 jobs:
   bump-version:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repo with token
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -22,15 +24,13 @@ jobs:
           version=$(jq -r '.version' package.json)
           echo "Current version: $version"
 
-          # Split and bump patch version
           IFS='.' read -r major minor patch <<< "$version"
           new_patch=$((patch + 1))
           new_version="$major.$minor.$new_patch"
           echo "New version: $new_version"
-
           echo "new_version=$new_version" >> $GITHUB_OUTPUT
 
-      - name: Create new branch and commit version bump
+      - name: Commit and push version bump
         env:
           GIT_AUTH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
@@ -39,11 +39,11 @@ jobs:
 
           git checkout -b version/${{ steps.versioning.outputs.new_version }}
 
-          # Update version in package.json
           jq --arg v "${{ steps.versioning.outputs.new_version }}" '.version = $v' package.json > tmp.json && mv tmp.json package.json
+
           git add package.json
           git commit -m "Bump version to ${{ steps.versioning.outputs.new_version }}"
 
-          # Set remote with token and push
+          # Set remote with token (even though checkout used it)
           git remote set-url origin https://x-access-token:${GIT_AUTH_TOKEN}@github.com/${{ github.repository }}.git
           git push origin version/${{ steps.versioning.outputs.new_version }}
