@@ -35,6 +35,7 @@ jobs:
 
       - name: Configure npm registry and auth token
         run: |
+          cd styles
           npm config set @tssammons:registry https://npm.pkg.github.com
           npm config set //npm.pkg.github.com/:_authToken "${NODE_AUTH_TOKEN}"
 
