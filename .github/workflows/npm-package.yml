@@ -41,4 +41,5 @@ jobs:
 
       - name: Publish to GitHub Packages
         run: |
-          npm publish styles --registry=https://npm.pkg.github.com
+          cd styles
+          npm publish --registry=https://npm.pkg.github.com
