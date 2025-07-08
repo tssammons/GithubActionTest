@@ -38,8 +38,9 @@ jobs:
           cd styles
           npm config set @tssammons:registry https://npm.pkg.github.com
           npm config set //npm.pkg.github.com/:_authToken "${{ secrets.NODE_AUTH_TOKEN }}"
+          npm view @tssammons/css-npm-test --registry=https://npm.pkg.github.com
 
-      - name: Publish to GitHub Packages
-        run: |
-          cd styles
-          npm publish --registry=https://npm.pkg.github.com
+      # - name: Publish to GitHub Packages
+      #   run: |
+      #     cd styles
+      #     npm publish --registry=https://npm.pkg.github.com
