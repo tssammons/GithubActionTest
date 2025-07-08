@@ -41,6 +41,7 @@ jobs:
 
       - name: Publish to GitHub Packages
         run: |
-          npm publish styles
-        #env:
-        #  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          cd styles
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
