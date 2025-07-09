@@ -25,7 +25,7 @@ jobs:
           cat <<EOF > styles/package.json
           {
             "name": "css-npm-test",
-            "version": "0.0.2",
+            "version": "0.0.1",
             "description": "Test CSS-only package",
             "main": "index.css",
             "files": ["index.css"],
@@ -63,7 +63,7 @@ jobs:
             git switch build-artifacts
           else
             git checkout --orphan build-artifacts
-            git reset --hard  # <- THIS clears working tree for orphan branch
+            git reset # --hard  # <- THIS clears working tree for orphan branch
           fi
 
       - name: Build and pack .tgz
