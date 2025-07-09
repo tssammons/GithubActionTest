@@ -1,0 +1,1 @@
+npm install https://raw.githubusercontent.com/john/GithubActionTest/build-artifacts/css-npm-test-0.0.1.tgz
