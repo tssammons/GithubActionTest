@@ -28,8 +28,8 @@ jobs:
         run: |
           # Extract branch name
           BRANCH="${GITHUB_REF#refs/heads/}"
-          VERSION="${BRANCH#release/}"
-          
+          VERSION="${BRANCH#feature/}"
+
           # Remove leading 'v' if present
           VERSION="${VERSION#v}"
 
