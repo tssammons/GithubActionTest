@@ -25,7 +25,7 @@ jobs:
           cat <<EOF > styles/package.json
           {
             "name": "css-npm-test",
-            "version": "0.0.1",
+            "version": "0.0.2",
             "description": "Test CSS-only package",
             "main": "index.css",
             "files": ["index.css"],
@@ -54,7 +54,7 @@ jobs:
       #     git add *.tgz
       #     git commit -m "chore: add built package"
       #     git push -f origin HEAD:build-artifacts
-      
+
       - name: Checkout build-artifacts or create it cleanly
         run: |
           git fetch origin build-artifacts || echo "No remote branch yet"
