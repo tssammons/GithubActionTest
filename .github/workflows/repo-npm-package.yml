@@ -50,6 +50,7 @@ jobs:
           npm pack
           cd ..
 
-          git add package/*.tgz
+          mv package/*.tgz .
+          git add *.tgz
           git commit -m "chore: add built package"
           git push -f origin HEAD:build-artifacts
