@@ -55,12 +55,12 @@ jobs:
       #     git commit -m "chore: add built package"
       #     git push -f origin HEAD:build-artifacts
 
-      - name: Fetch existing build-artifacts branch
+      - name: Fetch or create build-artifacts branch
         run: |
           git fetch origin build-artifacts || echo "No remote branch yet"
-          git checkout -B build-artifacts origin/build-artifacts || git checkout --orphan build-artifacts
+          git switch build-artifacts || git checkout --orphan build-artifacts
 
-      - name: Copy and pack new version
+      - name: Build and pack .tgz
         run: |
           mkdir package
           cp -r styles/* package/
@@ -69,10 +69,10 @@ jobs:
           cd ..
           mv package/*.tgz .
 
-      - name: Commit and push new .tgz without deleting old ones
+      - name: Commit and push the .tgz
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add *.tgz
-          git commit -m "chore: add new build $(date +'%Y-%m-%d %H:%M:%S')" || echo "Nothing to commit"
+          git commit -m "chore: add build $(date +'%Y-%m-%d %H:%M:%S')" || echo "Nothing to commit"
           git push origin build-artifacts
