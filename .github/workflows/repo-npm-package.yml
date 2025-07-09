@@ -25,7 +25,7 @@ jobs:
           cat <<EOF > styles/package.json
           {
             "name": "css-npm-test",
-            "version": "0.0.1",
+            "version": "0.0.2",
             "description": "Test CSS-only package",
             "main": "index.css",
             "files": ["index.css"],
