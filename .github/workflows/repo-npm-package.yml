@@ -1,0 +1,53 @@
+name: Test Publish to GitHub Packages
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          #registry-url: 'https://npm.pkg.github.com'
+
+      - name: Prepare test package
+        run: |
+          cat <<EOF > styles/package.json
+          {
+            "name": "css-npm-test",
+            "version": "0.0.1",
+            "description": "Test CSS-only package",
+            "main": "index.css",
+            "files": ["index.css"],
+            "license": "MIT",
+            "publishConfig": {
+              "registry": "https://npm.pkg.github.com/"
+            }
+          }
+          EOF
+
+      - name: Commit built files to branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Optional: Create a new branch with built files
+          git checkout --orphan build-output
+          git reset
+          mkdir package
+          cp -r styles/* package/
+          cd package
+          npm pack
+          cd ..
+
+          mv package/*.tgz your-package.tgz
+          git add your-package.tgz
+          git commit -m "chore: add built package"
+          git push -f origin HEAD:build-artifacts
