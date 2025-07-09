@@ -1,4 +1,4 @@
-name: Test Publish to GitHub Packages
+name: Test Publish NPM to Repo
 
 on:
   workflow_dispatch:
