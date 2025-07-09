@@ -54,11 +54,17 @@ jobs:
       #     git add *.tgz
       #     git commit -m "chore: add built package"
       #     git push -f origin HEAD:build-artifacts
-
-      - name: Fetch or create build-artifacts branch
+      
+      - name: Checkout build-artifacts or create it cleanly
         run: |
           git fetch origin build-artifacts || echo "No remote branch yet"
-          git switch build-artifacts || git checkout --orphan build-artifacts
+
+          if git ls-remote --exit-code origin build-artifacts; then
+            git switch build-artifacts
+          else
+            git checkout --orphan build-artifacts
+            git reset --hard  # <- THIS clears working tree for orphan branch
+          fi
 
       - name: Build and pack .tgz
         run: |
