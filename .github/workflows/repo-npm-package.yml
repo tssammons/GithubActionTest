@@ -1,7 +1,12 @@
 name: Test Publish NPM to Repo
 
+#on:
+#  workflow_dispatch:
+
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - 'feature/**'
 
 permissions:
   contents: write
@@ -18,20 +23,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          #registry-url: 'https://npm.pkg.github.com'
 
       - name: Prepare test package
         run: |
+          # Extract branch name
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          VERSION="${BRANCH#release/}"
+          
+          # Remove leading 'v' if present
+          VERSION="${VERSION#v}"
+
           cat <<EOF > styles/package.json
           {
             "name": "css-npm-test",
-            "version": "0.0.2",
+            "version": "$VERSION",
             "description": "Test CSS-only package",
             "main": "index.css",
             "files": ["index.css"],
             "license": "MIT",
             "publishConfig": {
-              "registry": "https://npm.pkg.github.com/"
             }
           }
           EOF
@@ -85,6 +95,7 @@ jobs:
           # Save .tgz outside repo so it survives branch switch/reset
           mkdir ../tmp-artifacts || true
           mv package/*.tgz ../tmp-artifacts/
+          rm -rf package
 
       - name: Fetch or create build-artifacts branch
         run: |
@@ -100,6 +111,7 @@ jobs:
       - name: Restore .tgz to build-artifacts branch root
         run: |
           mv ../tmp-artifacts/*.tgz .
+          rm -rf ../tmp-artifacts
 
       - name: Commit and push the .tgz
         run: |
