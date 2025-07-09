@@ -25,7 +25,7 @@ jobs:
           cat <<EOF > styles/package.json
           {
             "name": "css-npm-test",
-            "version": "0.0.2",
+            "version": "0.0.1",
             "description": "Test CSS-only package",
             "main": "index.css",
             "files": ["index.css"],
@@ -55,18 +55,7 @@ jobs:
       #     git commit -m "chore: add built package"
       #     git push -f origin HEAD:build-artifacts
 
-      - name: Checkout build-artifacts or create it cleanly
-        run: |
-          git fetch origin build-artifacts || echo "No remote branch yet"
-
-          if git ls-remote --exit-code origin build-artifacts; then
-            git switch build-artifacts
-          else
-            git checkout --orphan build-artifacts
-            git reset # --hard  # <- THIS clears working tree for orphan branch
-          fi
-
-      - name: Build and pack .tgz
+      - name: Build and pack .tgz on current branch (with source)
         run: |
           mkdir package
           cp -r styles/* package/
@@ -74,6 +63,22 @@ jobs:
           npm pack
           cd ..
           mv package/*.tgz .
+
+      - name: Fetch or create build-artifacts branch
+        run: |
+          git fetch origin build-artifacts || echo "No remote branch yet"
+
+          if git ls-remote --exit-code origin build-artifacts; then
+            git switch build-artifacts
+          else
+            git checkout --orphan build-artifacts
+            git reset --hard  # clean working dir on new orphan branch
+          fi
+
+      - name: Move packed .tgz to build-artifacts branch root
+        run: |
+          # .tgz was built on previous branch; move it here now
+          mv ../*.tgz .
 
       - name: Commit and push the .tgz
         run: |
